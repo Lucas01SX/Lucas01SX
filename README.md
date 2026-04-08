@@ -39,5 +39,5 @@ Os projetos neste perfil refletem esse caminho.
 
 ## Onde me encontrar
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-lucas--devdotnet-0A66C2?style=flat&logo=linkedin)](https://linkedin.com/in/lucas-devdotnet)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Perfil-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/lucas-dev-dotnet/)
 [![Email](https://img.shields.io/badge/Email-lukassantana351@gmail.com-D14836?style=flat&logo=gmail)](mailto:lukassantana351@gmail.com)
