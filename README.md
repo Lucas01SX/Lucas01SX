@@ -1,43 +1,54 @@
 # Lucas dos Santos Santana
 
-Desenvolvedor Backend com foco em C# e ASP.NET Core, atuando em sistemas distribuídos e APIs escaláveis.
+Desenvolvedor Backend com foco em **.NET — C# e ASP.NET Core**, construindo APIs REST e microsserviços em produção.
 
-Trabalho em uma plataforma SaaS com 8.000+ usuários ativos diários, construída sobre arquitetura de microsserviços com mais de 50 containers em produção. Sou responsável pelos microsserviços de autenticação, e-mail e API Gateway, aplicando Clean Architecture e definindo padrões de integração entre serviços.
-
-Participei da decisão arquitetural da plataforma desde a concepção — conduzindo benchmarks práticos entre Go, Node.js, NestJS, C# e Java Spring Boot, com monitoramento via Grafana.
+Atuo em projetos .NET 10 com Clean Architecture, Entity Framework Core, JWT, Redis, Kafka e cobertura de testes unitários e de integração. Tenho também experiência com Docker, CI/CD via GitLab e observabilidade com Grafana.
 
 ---
 
-## Stack principal
+## Stack
 
-**Backend**
-- C# · ASP.NET Core · Entity Framework Core
-- Node.js · NestJS · TypeORM
-- Laravel · Python
+<p>
+  <img src="https://skillicons.dev/icons?i=cs,dotnet,postgres,docker,redis,kafka,git,github" />
+</p>
 
-**Banco de dados**
-- PostgreSQL · SQL Server
-- Redis
-
-**Infraestrutura**
-- Docker · GitLab CI/CD
-- Ambientes dev / hom / prod
-
-**Práticas**
-- Clean Architecture · Microservices · REST APIs
-- JWT · Swagger · Scrum
+| | |
+|---|---|
+| **Backend** | C# · ASP.NET Core · Entity Framework Core · Minimal APIs · JWT |
+| **Bancos de dados** | PostgreSQL · SQL Server |
+| **Cache / Mensageria** | Redis · Kafka |
+| **Infraestrutura** | Docker · GitLab CI/CD · Grafana |
+| **Arquitetura** | Clean Architecture · Microsserviços · REST APIs |
+| **Testes** | Unitários · Integração (TestContainers + PostgreSQL real) |
 
 ---
 
-## O que estou construindo agora
+## Projetos
 
-Aprofundando minha especialização no ecossistema .NET — arquitetura de APIs com ASP.NET Core, Entity Framework Core e boas práticas do mundo Microsoft.
+### [Helpdesk Platform — .NET](https://github.com/Lucas01SX/helpdesk-platform-dotnet)
 
-Os projetos neste perfil refletem esse caminho.
+API REST em C# .NET 10 com ASP.NET Core, EF Core e Clean Architecture.
+
+- State machine de tickets (Open → In Progress → Resolved | Cancelled)
+- SLA por prioridade com auto-assign e auto-cancel
+- JWT (15 min) + Refresh Token com rotação, Argon2id e reuse detection
+- Eventos de domínio assíncronos, auditoria append-only, Serilog com correlationId
+- Testes unitários, de arquitetura e de integração com TestContainers
+
+### [Portfólio](https://lucas01sx.github.io)
+
+Portfólio pessoal com apresentação de projetos e stack — **lucas01sx.github.io**
 
 ---
 
-## Onde me encontrar
+## GitHub Stats
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Perfil-0A66C2?style=flat&logo=linkedin)](https://www.linkedin.com/in/lucas-dev-dotnet/)
-[![Email](https://img.shields.io/badge/Email-lukassantana351@gmail.com-D14836?style=flat&logo=gmail)](mailto:lukassantana351@gmail.com)
+![Stats](assets/stats.svg)
+
+---
+
+## Contato
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-lucas--devdotnet-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lucas-devdotnet/)
+[![Portfolio](https://img.shields.io/badge/Portfolio-lucas01sx.github.io-6e40c9?style=flat&logo=github&logoColor=white)](https://lucas01sx.github.io)
+[![Email](https://img.shields.io/badge/Email-lukassantana351@gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:lukassantana351@gmail.com)
