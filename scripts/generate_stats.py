@@ -9,9 +9,10 @@ from datetime import datetime, timezone
 USERNAME = os.environ.get("GITHUB_REPOSITORY_OWNER", "Lucas01SX")
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
-# totalCount is unaffected by pagination. total_stars is a lower bound: it
-# aggregates stargazerCount over the first 100 nodes (ordered by descending star
-# count), so any repo beyond the 100-node cap is excluded regardless of its star count.
+# total_stars sums only the nodes returned by the query (first: 100, ordered by
+# descending stargazerCount). Repos beyond that cap are silently excluded, so the
+# value is a lower bound — not a total — when the account has more than 100 repos.
+# totalCount is unaffected by this cap.
 QUERY = """
 {
   user(login: "%s") {
@@ -35,17 +36,17 @@ QUERY = """
 
 @dataclass(frozen=True)
 class Stats:
-    year: int           # calendar year this snapshot covers
-    total_repos: int    # lifetime, all owned non-fork repos
-    total_stars: int    # lifetime, lower bound (100-repo API cap, top-starred first)
-    year_contribs: int  # current calendar year, all contribution types
-    year_commits: int   # current calendar year, commits only (subset of year_contribs)
+    year: int
+    total_repos: int
+    total_stars: int    # lower bound — see QUERY comment for details
+    year_contribs: int
+    year_commits: int   # subset of year_contribs
 
     def __post_init__(self) -> None:
         if any(getattr(self, f.name) < 0 for f in fields(self)):
             raise ValueError(f"Stats fields must be non-negative: {self}")
         if self.year < 1970:
-            raise ValueError(f"year must be a valid calendar year (≥ 1970), got: {self.year}")
+            raise ValueError(f"year must be >= 1970 (Unix epoch lower bound for GitHub data), got: {self.year}")
         if self.year_commits > self.year_contribs:
             raise ValueError(
                 f"year_commits ({self.year_commits}) cannot exceed "
