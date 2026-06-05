@@ -31,7 +31,12 @@ jobs:
             exit 1
           fi
           if ! grep -q '<svg' assets/stats.svg; then
-            echo "ERROR: assets/stats.svg does not appear to be a valid SVG."
+            echo "ERROR: assets/stats.svg does not contain opening <svg tag."
+            cat assets/stats.svg
+            exit 1
+          fi
+          if ! grep -q '</svg>' assets/stats.svg; then
+            echo "ERROR: assets/stats.svg does not contain closing </svg> tag — file may be truncated."
             cat assets/stats.svg
             exit 1
           fi

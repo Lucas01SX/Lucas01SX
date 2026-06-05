@@ -71,10 +71,8 @@ def fetch(now: datetime) -> Stats:
         with urllib.request.urlopen(req, timeout=30) as res:
             raw = res.read()
     except urllib.error.HTTPError as e:
-        body = e.read().decode(errors='replace')[:200]
         raise RuntimeError(
-            f"GitHub API returned HTTP {e.code}. Verify GITHUB_TOKEN is valid. "
-            f"Response (first 200 chars): {body}"
+            f"GitHub API returned HTTP {e.code}. Verify GITHUB_TOKEN is valid and has required scopes."
         ) from e
     except urllib.error.URLError as e:
         raise RuntimeError(
@@ -88,11 +86,11 @@ def fetch(now: datetime) -> Stats:
             f"Response (first 500 chars): {raw[:500].decode(errors='replace')}"
         ) from e
     if "errors" in payload:
-        msgs = [e.get("message", str(e)) for e in payload["errors"]]
+        msgs = [err.get("message", str(err)) for err in payload["errors"]]
         raise RuntimeError("; ".join(msgs))
     data = payload.get("data")
     if data is None:
-        raise RuntimeError(f"GitHub API returned null 'data'. Full payload: {payload}")
+        raise RuntimeError("GitHub API returned null 'data'. Check GITHUB_TOKEN scopes.")
     user = data.get("user")
     if user is None:
         raise RuntimeError(
@@ -104,6 +102,12 @@ def fetch(now: datetime) -> Stats:
         contribs_data = user["contributionsCollection"]
         total_repos = repos_data["totalCount"]
         nodes = repos_data["nodes"]
+        if not isinstance(nodes, list):
+            raise RuntimeError(
+                f"Expected 'nodes' to be a list, got {type(nodes).__name__}. "
+                "The API schema may have changed."
+            )
+        total_stars = sum(r["stargazerCount"] for r in nodes)
         year_contribs = contribs_data["contributionCalendar"]["totalContributions"]
         year_commits = contribs_data["totalCommitContributions"]
     except KeyError as e:
@@ -114,10 +118,14 @@ def fetch(now: datetime) -> Stats:
     return Stats(
         year=now.year,
         total_repos=total_repos,
-        total_stars=sum(r["stargazerCount"] for r in nodes),
+        total_stars=total_stars,
         year_contribs=year_contribs,
         year_commits=year_commits,
     )
+
+
+def _xml_escape(value: object) -> str:
+    return str(value).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
 def render(stats: Stats) -> str:
@@ -136,15 +144,15 @@ def render(stats: Stats) -> str:
 
     def cell(x, y, label, val):
         return (
-            f'<text x="{x}" y="{y}" fill="{TEXT}" font-size="13">{label}</text>'
-            f'<text x="{x + VAL_OFFSET}" y="{y}" fill="{VALUE}" font-size="13" font-weight="600">{val}</text>'
+            f'<text x="{x}" y="{y}" fill="{TEXT}" font-size="13">{_xml_escape(label)}</text>'
+            f'<text x="{x + VAL_OFFSET}" y="{y}" fill="{VALUE}" font-size="13" font-weight="600">{_xml_escape(val)}</text>'
         )
 
     return f"""<svg width="{W}" height="{H}" viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg">
   <rect width="{W}" height="{H}" rx="6" fill="{BG}" stroke="{BORDER}" stroke-width="1"/>
   <line x1="{PAD}" y1="{DIVIDER_Y}" x2="{W - PAD}" y2="{DIVIDER_Y}" stroke="{BORDER}" stroke-width="1"/>
   <g font-family="{FONT}">
-    <text x="{PAD}" y="{TITLE_Y}" fill="{TITLE}" font-size="14" font-weight="600">GitHub Stats — {stats.year}</text>
+    <text x="{PAD}" y="{TITLE_Y}" fill="{TITLE}" font-size="14" font-weight="600">GitHub Stats — {_xml_escape(stats.year)}</text>
     {cell(PAD, ROW1_Y, "Contribuições", stats.year_contribs)}{cell(COL2_X, ROW1_Y, "Commits", stats.year_commits)}
     {cell(PAD, ROW2_Y, "Repositórios", stats.total_repos)}{cell(COL2_X, ROW2_Y, "Stars", stats.total_stars)}
   </g>
