@@ -2,8 +2,24 @@
 __pycache__/
 *.py[cod]
 .pytest_cache/
+*.egg-info/
+dist/
+build/
 
 # Virtual environments
 .venv/
 venv/
 env/
+
+# Linters / formatters
+.ruff_cache/
+.mypy_cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+*.pem
+*.key
