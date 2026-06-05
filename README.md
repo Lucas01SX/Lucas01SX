@@ -49,6 +49,6 @@ Portfólio pessoal com apresentação de projetos e stack — **lucas01sx.github
 
 ## Contato
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-lucas--dev--dotnet-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lucas-dev-dotnet/)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-lucas_dev_dotnet-0A66C2?style=flat&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/lucas-dev-dotnet/)
 [![Portfolio](https://img.shields.io/badge/Portfolio-lucas01sx.github.io-6e40c9?style=flat&logo=github&logoColor=white)](https://lucas01sx.github.io)
 [![Email](https://img.shields.io/badge/Email-lukassantana351@gmail.com-D14836?style=flat&logo=gmail&logoColor=white)](mailto:lukassantana351@gmail.com)

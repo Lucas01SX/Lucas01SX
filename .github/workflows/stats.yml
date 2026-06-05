@@ -42,14 +42,14 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          if ! git pull --rebase --autostash origin main; then
+            echo "ERROR: git pull --rebase failed. A concurrent push may have caused a conflict."
+            git rebase --abort 2>/dev/null || true
+            exit 1
+          fi
           git add assets/stats.svg
           if ! git diff --cached --quiet; then
             git commit -m "chore: update stats"
-            if ! git pull --rebase origin main; then
-              echo "ERROR: git pull --rebase failed. A concurrent push may have caused a conflict."
-              git rebase --abort
-              exit 1
-            fi
             if ! git push origin HEAD:main; then
               echo "ERROR: git push failed. Verify GITHUB_TOKEN has 'contents: write' permission."
               exit 1

@@ -6,7 +6,7 @@ import urllib.request
 from dataclasses import dataclass, fields
 from datetime import datetime, timezone
 
-USERNAME = "Lucas01SX"
+USERNAME = os.environ.get("GITHUB_REPOSITORY_OWNER", "Lucas01SX")
 REPO_ROOT = pathlib.Path(__file__).resolve().parent.parent
 
 # totalCount is unaffected by pagination. total_stars is a lower bound: it
