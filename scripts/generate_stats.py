@@ -87,8 +87,15 @@ def fetch(now: datetime) -> Stats:
             f"Response (first 500 chars): {raw[:500].decode(errors='replace')}"
         ) from e
     if "errors" in payload:
-        msgs = [err.get("message", str(err)) for err in payload["errors"]]
-        raise RuntimeError("; ".join(msgs))
+        errors_raw = payload["errors"]
+        if isinstance(errors_raw, list):
+            msgs = [
+                err.get("message", str(err)) if isinstance(err, dict) else str(err)
+                for err in errors_raw
+            ]
+        else:
+            msgs = [str(errors_raw)]
+        raise RuntimeError(f"GitHub GraphQL API returned errors: {'; '.join(msgs)}")
     data = payload.get("data")
     if data is None:
         raise RuntimeError("GitHub API returned null 'data'. Check GITHUB_TOKEN scopes.")
@@ -111,9 +118,9 @@ def fetch(now: datetime) -> Stats:
         total_stars = sum(node["stargazerCount"] for node in nodes)
         year_contribs = contribs_data["contributionCalendar"]["totalContributions"]
         year_commits = contribs_data["totalCommitContributions"]
-    except KeyError as e:
+    except (KeyError, TypeError) as e:
         raise RuntimeError(
-            f"GitHub API response is missing expected field {e}. "
+            f"GitHub API response is missing expected field or contains unexpected null: {e}. "
             "The API schema may have changed."
         ) from e
     return Stats(

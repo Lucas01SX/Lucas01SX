@@ -10,7 +10,7 @@ import pytest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "scripts"))
 
-from generate_stats import Stats, fetch, render
+from generate_stats import Stats, _xml_escape, fetch, render
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -73,11 +73,13 @@ def test_render_is_valid_svg():
 
 def test_render_zero_values():
     s = Stats(year=2024, total_repos=0, total_stars=0, year_contribs=0, year_commits=0)
-    svg = render(s)
-    assert f">{s.total_repos}<" in svg
-    assert f">{s.total_stars}<" in svg
-    assert f">{s.year_contribs}<" in svg
-    assert f">{s.year_commits}<" in svg
+    assert render(s).count(">0<") == 4
+
+
+def test_xml_escape_special_chars():
+    assert _xml_escape("a&b") == "a&amp;b"
+    assert _xml_escape("<tag>") == "&lt;tag&gt;"
+    assert _xml_escape(42) == "42"
 
 
 def test_render_two_column_layout():
@@ -93,6 +95,7 @@ def test_render_two_column_layout():
 # ---------------------------------------------------------------------------
 
 @pytest.mark.parametrize("field,value", [
+    ("year", -1),
     ("total_repos", -1),
     ("total_stars", -1),
     ("year_contribs", -1),
@@ -190,6 +193,26 @@ def test_fetch_raises_on_url_error():
         patch("urllib.request.urlopen", side_effect=url_error),
         patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
         pytest.raises(RuntimeError, match="Failed to reach"),
+    ):
+        fetch(NOW)
+
+
+def test_fetch_raises_on_non_list_nodes():
+    payload = {
+        "data": {
+            "user": {
+                "repositories": {"totalCount": 1, "nodes": "not-a-list"},
+                "contributionsCollection": {
+                    "totalCommitContributions": 0,
+                    "contributionCalendar": {"totalContributions": 0},
+                },
+            }
+        }
+    }
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="API schema may have changed"),
     ):
         fetch(NOW)
 
