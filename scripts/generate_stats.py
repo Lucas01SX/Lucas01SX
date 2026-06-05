@@ -107,7 +107,7 @@ def fetch(now: datetime) -> Stats:
                 f"Expected 'nodes' to be a list, got {type(nodes).__name__}. "
                 "The API schema may have changed."
             )
-        total_stars = sum(r["stargazerCount"] for r in nodes)
+        total_stars = sum(node["stargazerCount"] for node in nodes)
         year_contribs = contribs_data["contributionCalendar"]["totalContributions"]
         year_commits = contribs_data["totalCommitContributions"]
     except KeyError as e:
@@ -142,7 +142,7 @@ def render(stats: Stats) -> str:
     ROW1_Y = 82
     ROW2_Y = 122
 
-    def cell(x, y, label, val):
+    def cell(x: int, y: int, label: str, val: object) -> str:
         return (
             f'<text x="{x}" y="{y}" fill="{TEXT}" font-size="13">{_xml_escape(label)}</text>'
             f'<text x="{x + VAL_OFFSET}" y="{y}" fill="{VALUE}" font-size="13" font-weight="600">{_xml_escape(val)}</text>'

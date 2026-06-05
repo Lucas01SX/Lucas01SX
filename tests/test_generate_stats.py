@@ -16,12 +16,16 @@ from generate_stats import Stats, fetch, render
 # Helpers
 # ---------------------------------------------------------------------------
 
-def _mock_urlopen(payload: dict):
+def _mock_urlopen_raw(raw: bytes):
     mock_response = MagicMock()
-    mock_response.read.return_value = json.dumps(payload).encode()
+    mock_response.read.return_value = raw
     mock_response.__enter__ = lambda s: s
     mock_response.__exit__ = MagicMock(return_value=False)
     return MagicMock(return_value=mock_response)
+
+
+def _mock_urlopen(payload: dict):
+    return _mock_urlopen_raw(json.dumps(payload).encode())
 
 
 NOW = datetime(2025, 6, 5, tzinfo=timezone.utc)
@@ -116,9 +120,11 @@ def test_stats_rejects_invalid_year():
 # ---------------------------------------------------------------------------
 
 def test_fetch_happy_path():
-    with patch("urllib.request.urlopen", _mock_urlopen(VALID_PAYLOAD)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            stats = fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(VALID_PAYLOAD)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+    ):
+        stats = fetch(NOW)
     assert stats == Stats(year=2025, total_repos=7, total_stars=4, year_contribs=232, year_commits=187)
 
 
@@ -130,58 +136,68 @@ def test_fetch_raises_without_token(monkeypatch):
 
 def test_fetch_raises_on_graphql_errors():
     payload = {"errors": [{"message": "Could not resolve to a User"}]}
-    with patch("urllib.request.urlopen", _mock_urlopen(payload)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="Could not resolve"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="Could not resolve"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_null_data():
     payload = {"data": None}
-    with patch("urllib.request.urlopen", _mock_urlopen(payload)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="null 'data'"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="null 'data'"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_null_user():
     payload = {"data": {"user": None}}
-    with patch("urllib.request.urlopen", _mock_urlopen(payload)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="null for user"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="null for user"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_missing_field():
     payload = {"data": {"user": {"repositories": {"totalCount": 1, "nodes": []}}}}
-    with patch("urllib.request.urlopen", _mock_urlopen(payload)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="API schema may have changed"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="API schema may have changed"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_http_error():
     http_error = urllib.error.HTTPError(url="", code=401, msg="Unauthorized", hdrs=None, fp=None)
-    with patch("urllib.request.urlopen", side_effect=http_error):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="HTTP 401"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", side_effect=http_error),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="HTTP 401"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_url_error():
     url_error = urllib.error.URLError(reason="Connection refused")
-    with patch("urllib.request.urlopen", side_effect=url_error):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="Failed to reach"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", side_effect=url_error),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="Failed to reach"),
+    ):
+        fetch(NOW)
 
 
 def test_fetch_raises_on_invalid_json():
-    mock_response = MagicMock()
-    mock_response.read.return_value = b"not json"
-    mock_response.__enter__ = lambda s: s
-    mock_response.__exit__ = MagicMock(return_value=False)
-    with patch("urllib.request.urlopen", MagicMock(return_value=mock_response)):
-        with patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}):
-            with pytest.raises(RuntimeError, match="non-JSON"):
-                fetch(NOW)
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen_raw(b"not json")),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="non-JSON"),
+    ):
+        fetch(NOW)
