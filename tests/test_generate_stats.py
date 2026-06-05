@@ -73,6 +73,7 @@ def test_render_is_valid_svg():
 
 def test_render_zero_values():
     s = Stats(year=2024, total_repos=0, total_stars=0, year_contribs=0, year_commits=0)
+    # 4 = one per stat cell (year_contribs, year_commits, total_repos, total_stars)
     assert render(s).count(">0<") == 4
 
 
@@ -139,10 +140,21 @@ def test_fetch_raises_without_token(monkeypatch):
 
 def test_fetch_raises_on_graphql_errors():
     payload = {"errors": [{"message": "Could not resolve to a User"}]}
+
     with (
         patch("urllib.request.urlopen", _mock_urlopen(payload)),
         patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
         pytest.raises(RuntimeError, match="Could not resolve"),
+    ):
+        fetch(NOW)
+
+
+def test_fetch_raises_on_graphql_errors_non_list():
+    payload = {"errors": "Authentication required"}
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="Authentication required"),
     ):
         fetch(NOW)
 
@@ -193,6 +205,26 @@ def test_fetch_raises_on_url_error():
         patch("urllib.request.urlopen", side_effect=url_error),
         patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
         pytest.raises(RuntimeError, match="Failed to reach"),
+    ):
+        fetch(NOW)
+
+
+def test_fetch_raises_on_null_node_in_nodes():
+    payload = {
+        "data": {
+            "user": {
+                "repositories": {"totalCount": 1, "nodes": [None]},
+                "contributionsCollection": {
+                    "totalCommitContributions": 0,
+                    "contributionCalendar": {"totalContributions": 0},
+                },
+            }
+        }
+    }
+    with (
+        patch("urllib.request.urlopen", _mock_urlopen(payload)),
+        patch.dict("os.environ", {"GITHUB_TOKEN": "fake"}),
+        pytest.raises(RuntimeError, match="API schema may have changed"),
     ):
         fetch(NOW)
 
