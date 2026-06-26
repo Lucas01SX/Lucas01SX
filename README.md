@@ -1,23 +1,25 @@
 # Lucas dos Santos Santana
 
-Desenvolvedor Backend com foco em **.NET — C# e ASP.NET Core**, construindo APIs REST e microsserviços em produção.
+Analista de Sistemas com duplo foco em **Backend .NET** e **DevOps**. Desenvolvo APIs e microsserviços com .NET 8+/C# e opero infraestrutura em produção com Docker, GitLab CI/CD, Grafana e Kong API Gateway.
 
-Atuo em projetos .NET 10 com Clean Architecture, Entity Framework Core, JWT, Redis, Kafka e cobertura de testes unitários e de integração. Tenho também experiência com Docker, CI/CD via GitLab e observabilidade com Grafana.
+Investiguei e resolvi incidentes de produção, incluindo a redução de consumo de CPU de uma API NestJS de 14% para menos de 3%, e a correção de um vazamento de memória em plugin customizado do Kong API Gateway que reduziu o uso de RAM do servidor de 35% para ~3%. Uso Linux no dia a dia — máquina pessoal e servidores de produção.
 
 ---
 
 ## Stack
 
 <p>
-  <img src="https://skillicons.dev/icons?i=cs,dotnet,postgres,docker,redis,kafka,git,github" />
+  <img src="https://skillicons.dev/icons?i=cs,dotnet,postgres,docker,redis,kafka,python,linux,git,github" />
 </p>
 
 | | |
 |---|---|
-| **Backend** | C# · ASP.NET Core · Entity Framework Core · Minimal APIs · JWT |
+| **Backend** | C# · ASP.NET Core · .NET 8+ · Entity Framework Core · Minimal APIs · JWT |
 | **Bancos de dados** | PostgreSQL · SQL Server |
 | **Cache / Mensageria** | Redis · Kafka |
-| **Infraestrutura** | Docker · GitLab CI/CD · Grafana |
+| **DevOps** | Docker · GitLab CI/CD · Kong API Gateway · Linux |
+| **Observabilidade** | Grafana · Diagnóstico de incidentes · Monitoramento de produção |
+| **Scripting** | Python (2 anos) · Bash (1 ano) |
 | **Arquitetura** | Clean Architecture · Microsserviços · REST APIs |
 | **Testes** | Unitários · Integração (TestContainers + PostgreSQL real) |
 
