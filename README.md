@@ -6,7 +6,7 @@ Meu trabalho do dia a dia fica em repositórios privados da empresa, então este
 
 ## Stack
 
-| | |
+| Área | Tecnologias |
 |---|---|
 | **Backend** | C# · .NET 8+ · ASP.NET Core · Entity Framework · Dapper · NestJS · TypeScript · TypeORM · Python · Flask · Laravel · Node.js |
 | **Frontend** | React · Angular · jQuery |
